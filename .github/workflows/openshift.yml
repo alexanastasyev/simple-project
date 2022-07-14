@@ -104,23 +104,32 @@ jobs:
       with:
         oc: 4
 
-    - name: Log in to OpenShift
-      uses: redhat-actions/oc-login@v1
-      with:
-        openshift_server_url: ${{ env.OPENSHIFT_SERVER }}
-        openshift_token: ${{ env.OPENSHIFT_TOKEN }}
-        insecure_skip_tls_verify: true
-        namespace: ${{ env.OPENSHIFT_NAMESPACE }}
+#    - name: Log in to OpenShift
+#      uses: redhat-actions/oc-login@v1
+#      with:
+#        openshift_server_url: ${{ env.OPENSHIFT_SERVER }}
+#        openshift_token: ${{ env.OPENSHIFT_TOKEN }}
+#        insecure_skip_tls_verify: true
+#        namespace: ${{ env.OPENSHIFT_NAMESPACE }}
 
-    - name: Create and expose app
-      id: deploy-and-expose
-      uses: redhat-actions/oc-new-app@v1
+#    - name: Create and expose app
+#      id: deploy-and-expose
+#      uses: redhat-actions/oc-new-app@v1
+#      with:
+#        app_name: ${{ env.APP_NAME }}
+#        image: ${{ steps.push-image.outputs.registry-path }}
+#        namespace: ${{ env.OPENSHIFT_NAMESPACE }}
+#        port: ${{ env.APP_PORT }}
+
+    - name: OpenShift Action
+      uses: redhat-developer/openshift-actions@v2.1.0
       with:
-        app_name: ${{ env.APP_NAME }}
-        build_env: overwrite=true
-        image: ${{ steps.push-image.outputs.registry-path }}
-        namespace: ${{ env.OPENSHIFT_NAMESPACE }}
-        port: ${{ env.APP_PORT }}
+        version: '4.3'
+        openshift_server_url: ${{ env.OPENSHIFT_SERVER }}
+        parameters: '{"apitoken": "${{ env.OPENSHIFT_TOKEN }}", "acceptUntrustedCerts": "true"}'
+        cmd: |
+          oc delete all --selector=app=${{ env.APP_NAME }}
+          oc new-app --name=${{ env.APP_NAME }} --labels=app=${{ env.APP_NAME }} ${{ steps.push-image.outputs.registry-path }}
 
     - name: Print application URL
       env:
