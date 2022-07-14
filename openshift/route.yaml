@@ -1,10 +1,10 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: simple-project-route
+  name: simple-project
 spec:
   to:
     kind: Service
-    name: simple-project-service
+    name: simple-project
   port:
     targetPort: 8090
