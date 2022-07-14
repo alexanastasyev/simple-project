@@ -15,7 +15,7 @@ public class CurrentTimeController {
 
     private static final String FORMAT_VALUE_TRUE = "true";
     private static final String FORMAT_VALUE_FALSE = "false";
-    private static final String FORMAT_ERROR = "Invalid name of parameter \"format\"";
+    private static final String FORMAT_ERROR = "Invalid value of parameter \"format\"";
 
     private final CurrentTimeService currentTimeService;
 
