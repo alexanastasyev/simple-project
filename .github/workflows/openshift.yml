@@ -103,7 +103,7 @@ jobs:
         insecure_skip_tls_verify: true
         namespace: ${{ env.OPENSHIFT_NAMESPACE }}
 
-    - name: Deploy image to OpenShift
+    - name: Deploy to OpenShift
       run: |
         oc delete all --selector=app=${{ env.APP_NAME }}
         oc new-app --name=${{ env.APP_NAME }} --labels=app=${{ env.APP_NAME }} ${{ steps.push-image.outputs.registry-path }}
