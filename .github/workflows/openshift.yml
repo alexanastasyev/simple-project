@@ -24,10 +24,6 @@ jobs:
     runs-on: ubuntu-20.04
     environment: production
 
-    outputs:
-      ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
-      SELECTOR: ${{ steps.deploy-and-expose.outputs.selector }}
-
     steps:
     - name: Check for required secrets
       uses: actions/github-script@v6
