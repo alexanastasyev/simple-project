@@ -104,15 +104,20 @@ jobs:
       with:
         oc: 4
 
-#    - name: Log in to OpenShift
-#      uses: redhat-actions/oc-login@v1
-#      with:
-#        openshift_server_url: ${{ env.OPENSHIFT_SERVER }}
-#        openshift_token: ${{ env.OPENSHIFT_TOKEN }}
-#        insecure_skip_tls_verify: true
-#        namespace: ${{ env.OPENSHIFT_NAMESPACE }}
+    - name: Log in to OpenShift
+      uses: redhat-actions/oc-login@v1
+      with:
+        openshift_server_url: ${{ env.OPENSHIFT_SERVER }}
+        openshift_token: ${{ env.OPENSHIFT_TOKEN }}
+        insecure_skip_tls_verify: true
+        namespace: ${{ env.OPENSHIFT_NAMESPACE }}
 
-#    - name: Create and expose app
+    - name: Deploy image to OpenShift
+      run: |
+        oc delete all --selector=app=${{ env.APP_NAME }}
+        oc new-app --name=${{ env.APP_NAME }} --labels=app=${{ env.APP_NAME }} ${{ steps.push-image.outputs.registry-path }}
+
+      #    - name: Create and expose app
 #      id: deploy-and-expose
 #      uses: redhat-actions/oc-new-app@v1
 #      with:
@@ -121,25 +126,28 @@ jobs:
 #        namespace: ${{ env.OPENSHIFT_NAMESPACE }}
 #        port: ${{ env.APP_PORT }}
 
-    - name: OpenShift Action
-      uses: redhat-developer/openshift-actions@v2.1.0
-      with:
-        version: '4.3'
-        openshift_server_url: ${{ env.OPENSHIFT_SERVER }}
-        parameters: '{"apitoken": "${{ env.OPENSHIFT_TOKEN }}", "acceptUntrustedCerts": "true"}'
-        cmd: |
-          oc delete all --selector=app=${{ env.APP_NAME }}
-          oc new-app --name=${{ env.APP_NAME }} --labels=app=${{ env.APP_NAME }} ${{ steps.push-image.outputs.registry-path }}
+#    - name: Allow unsecure commands
+#      run: echo 'ACTIONS_ALLOW_UNSECURE_COMMANDS=true' >> $GITHUB_ENV
+#
+#    - name: OpenShift deploy app
+#      uses: redhat-developer/openshift-actions@v2.1.0
+#      with:
+#        version: '4.3'
+#        openshift_server_url: ${{ env.OPENSHIFT_SERVER }}
+#        parameters: '{"apitoken": "${{ env.OPENSHIFT_TOKEN }}", "acceptUntrustedCerts": "true"}'
+#        cmd: |
+#          oc delete all --selector=app=${{ env.APP_NAME }}
+#          oc new-app --name=${{ env.APP_NAME }} --labels=app=${{ env.APP_NAME }} ${{ steps.push-image.outputs.registry-path }}
 
-    - name: Print application URL
-      env:
-        ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
-        SELECTOR: ${{ steps.deploy-and-expose.outputs.selector }}
-      run: |
-        [[ -n ${{ env.ROUTE }} ]] || (echo "Determining application route failed in previous step"; exit 1)
-        echo
-        echo "======================== Your application is available at: ========================"
-        echo ${{ env.ROUTE }}
-        echo "==================================================================================="
-        echo
-        echo "Your app can be taken down with: \"oc delete all --selector='${{ env.SELECTOR }}'\""
+#    - name: Print application URL
+#      env:
+#        ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
+#        SELECTOR: ${{ steps.deploy-and-expose.outputs.selector }}
+#      run: |
+#        [[ -n ${{ env.ROUTE }} ]] || (echo "Determining application route failed in previous step"; exit 1)
+#        echo
+#        echo "======================== Your application is available at: ========================"
+#        echo ${{ env.ROUTE }}
+#        echo "==================================================================================="
+#        echo
+#        echo "Your app can be taken down with: \"oc delete all --selector='${{ env.SELECTOR }}'\""
